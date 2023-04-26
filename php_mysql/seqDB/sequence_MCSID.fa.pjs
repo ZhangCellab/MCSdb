@@ -1,0 +1,22 @@
+{
+  "version": "1.2",
+  "dbname": "sequence_MCSID.fa",
+  "dbtype": "Protein",
+  "db-version": 5,
+  "description": "sequence_MCSID.fa",
+  "number-of-letters": 4077817,
+  "number-of-sequences": 6588,
+  "last-updated": "2022-06-26T00:08:00",
+  "number-of-volumes": 1,
+  "bytes-total": 5000143,
+  "bytes-to-cache": 4137222,
+  "files": [
+    "sequence_MCSID.fa.pdb",
+    "sequence_MCSID.fa.phr",
+    "sequence_MCSID.fa.pin",
+    "sequence_MCSID.fa.pot",
+    "sequence_MCSID.fa.psq",
+    "sequence_MCSID.fa.ptf",
+    "sequence_MCSID.fa.pto"
+  ]
+}

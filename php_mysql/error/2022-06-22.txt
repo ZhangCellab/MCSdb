@@ -1,0 +1,10 @@
+数据库不可用：
+
+客户IP:58.249.1.71
+时间 :2022-06-22 12:55:41
+
+错误sql语句：
+SELECT * FROM hpa_table WHERE Gene_entrez='23230' order by NX DESC;
+客户IP:58.249.1.71
+时间 :2022-06-22 12:55:41
+
