@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="Shelly">
+  <meta name="keyword" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Webserver</title>
+  <link href="./css/general.css" rel="stylesheet" type="text/css">
+  <link href="./css/swiper-bundle.min.css" rel="stylesheet" >
+  <link href="./boostrap3/css/bootstrap.css" rel="stylesheet">
+  <link href="./css/font-awesome.css" rel="stylesheet" type="text/css" />
+  <script src="./js/jquery-1.11.2.min.js"> </script>
+  <script src="./boostrap3/js/bootstrap.js" type="text/javascript"></script>
+  <script src="./js/swiper-bundle.min.js"> </script>
+  <link rel="stylesheet" href="./boostrap3/select_boostrap/css/bootstrap-select.min.css">
+  <script src="./boostrap3/select_boostrap//js/bootstrap-select.min.js"></script>
+  <script src="./js/pdfobject.js"> </script>
+
+    <link rel="stylesheet" type="text/css" href="./css/sweetalert.css">
+    <script type="text/javascript" src="./js/sweetalert-dev.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+
+        $("#input_list").val('MA HUANG\r\n'+'KU XING REN\r\n'+'BAI ZHU\r\n'+'NIU HUANG\r\n'+'SHE DAN\r\n'+'SAN QI\r\n');
+
+        $("#inputtype").change(function(){
+            var obj = document.getElementById("inputtype");
+            var index = obj.selectedIndex; // 选中索引
+            var text = obj.options[index].text; // 选中文本
+            var value = obj.options[index].value; // 选中值
+
+            // console.log(text);
+            // console.log(value);
+
+            if(value=='pinyin'){
+                document.getElementById('input_list').value='MA HUANG\r\n'+'KU XING REN\r\n'+'BAI ZHU\r\n'+'NIU HUANG\r\n'+'SHE DAN\r\n'+'SAN QI\r\n';
+            }else if(value=='zhongwen'){
+                document.getElementById('input_list').value='麻黄\r\n'+'苦杏仁\r\n'+'白术\r\n'+'牛黄\r\n'+'蛇胆\r\n'+'三七\r\n';
+
+            }else if(value=='english'){
+                document.getElementById('input_list').value='Ephedra\r\n'+'bitter Apricot seed\r\n'+'rhizome of Largehead Atractylodes\r\n'+'Cow-bezoar\r\n'+'Snake bile\r\n'+'SAN QI\r\n';
+
+            }else if(value=='herbid'){
+                document.getElementById('input_list').value='HERB003658\r\n'+'HERB003174\r\n'+'HERB000309\r\n'+'HERB004201\r\n'+'HERB004972\r\n'+'HERB004783\r\n';
+            }
+
+
+
+        });
+
+    });
+
+    function carryEnrich(){
+      var myTextarea = $('#input_list').val();
+      console.log(myTextarea);
+      var splitArray = [] // 保存分割的字符串
+      var lastIndex = -1 // 记录上一次访问到换行符的位置
+
+      for (var i = 0, l = myTextarea.length ; i < l  ; i++) {
+        if ([10, 13].indexOf(myTextarea[i].charCodeAt()) != -1) { // 根据换行符的 ascii push
+          splitArray.push(myTextarea.substring(lastIndex + 1, i).trim()) // 将这部分的值进行首尾空格消除
+          lastIndex = i
+        }
+      }
+
+      if ( myTextarea.substr(lastIndex)) { // 最后一行数据后面没有换行符的情况下，处理最后一行数据
+        splitArray.push(myTextarea.substr(lastIndex).trim()) // 进行首尾空格消除
+      }
+      // splitArray.forEach(function (str) {
+      //   var item = str.split(/\s+/) // 匹配有效数据之间的空格
+      //   console.log(item)
+      // })
+      console.log(splitArray);
+      // console.log(typeof(splitArray));
+      // console.log(splitArray instanceof Array);
+
+      document.getElementById("hidden_box").style.display="none";
+
+      var myType = $('#inputtype option:selected').val();
+      var myPvalue = $('#pValue').val()
+
+      $.ajax({
+        type:'post',
+        data: {
+          // 传参给 getServer.php, get方法后期可作为API
+          inputData: splitArray,
+          inputype: myType,
+          pvalue: myPvalue
+        },
+        dataType:'json',
+        url: "./php_mysql/getServer.php",
+        success: function(resultURL) {
+          console.log(resultURL);
+          gettxtUrl = resultURL.resultURL.txtUrl;
+          getpdfUrl = resultURL.resultURL.pdfUrl;
+          getreport_content = resultURL.resultURL.report_content;
+          console.log(gettxtUrl);
+          console.log(getpdfUrl);
+          console.log(getreport_content);
+
+          if(getreport_content=="success"){
+              document.getElementById("hidden_box").style.display="block";
+              document.getElementById("res_download").href=gettxtUrl;
+              document.getElementById("img_download").href=getpdfUrl;
+
+              if(PDFObject.supportsPDFs){
+                  // console.log("Yay, this browser supports inline PDFs.");
+              } else {
+                  alert("Sorry, online PDFs are not supported by this browser, please download the PDF directly or change the browser.");
+              }
+
+              PDFObject.embed(getpdfUrl, "#img_change");
+
+              $('html, body').animate({scrollTop: $('#hidden_box').offset().top}, 100);
+          }else{
+              // alert("Sorry for the inconvenience in your usage\r\n" + getreport_content);
+
+              swal({
+                  title: "Sorry for the inconvenience in your usage",
+                  text: '<p style=\'color:#b90322; font-size:18px\'>'+getreport_content + ' Please check your choice of Herb Type or try again with other input.' +'<p>',
+                  html: true
+              });
+
+          }
+
+        },
+        error:function(XMLHttpResponse, textStatus, errorThrown){
+
+            console.log("1 异步调用返回失败,XMLHttpResponse.readyState:"+XMLHttpResponse.readyState);
+            console.log("2 异步调用返回失败,XMLHttpResponse.status:"+XMLHttpResponse.status);
+            console.log("2 异步调用返回失败,XMLHttpResponse.responseText:"+XMLHttpResponse.responseText);
+            console.log("3 异步调用返回失败,textStatus:"+textStatus);
+            console.log("4 异步调用返回失败,errorThrown:"+errorThrown);
+
+          console.log(myType);
+          console.log(myPvalue);
+          alert('Fail to carry out enrichment!');
+        }
+      });
+
+    }
+
+  </script>
+  <style>
+        #img_download:hover{
+            color: #266686 !important;
+        }
+        #res_download:hover{
+            color: #266686 !important;
+        }
+        #img_change{
+            height: 800px;
+        }
+        .box-title {
+            border-bottom: 1px solid #cdcdcd;
+            width: 100%;
+            text-align: center;
+            display: block;
+            font-size: 18px;
+            padding-top: 16px;
+            padding-bottom: 10px;
+            color: black;
+        }
+        .searchFrame {
+            margin: 45px 45px 10px 10px;
+            border: 1px solid #dddddd;
+            border-radius: 5px;
+            position: relative;
+        }
+        .searchTitle {
+            background: #e70;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 20px;
+            position: absolute;
+            top: -22px;
+            left: 20px;
+        }
+        ul.searchIntro {
+            word-break: break-all;
+        }
+        .searchIntro {
+            list-style-type: square;
+            color: #6b8cf7;
+            padding: 0px 0px 0px 15px;
+            line-height: 25px;
+            font-size: 15px;
+        }
+        ul.searchIntro li {
+            list-style-type: square;
+            color: #d86e04;
+            text-align: left;
+        }
+        .searchIntro li span{
+            line-height: 27px;
+            color: black;
+            font-size: 16px;
+        }
+        .searchIntro li a{
+            line-height: 27px;
+            font-size: 16px;
+        }
+  </style>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?50f0aa9070666122b13e0d8f58eefef0";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+</head>
+<body>
+<nav class = "navbar navbar-custom" role = "navigation" style="border-radius: 0px">
+  <div class="container lty" style="min-height: 80px;">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle = "collapse"  data-target = "#target-menu">
+        <span class="sr-only"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <a href="index.html" class="navbar-brand">
+        <p class="log">TCM2COVID</p>
+        <!--                    <img src="image/logo1.png">-->
+      </a>
+
+    </div>
+    <div class="collapse navbar-collapse" id="target-menu" style="vertical-align: middle;">
+      <ul class="nav navbar-nav navbar-right">
+        <li class="nav-item">
+          <a class="navgation" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="search.html">Search</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="webservice.html">Webserver</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="download.html">Download</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="statistics.html">Statistics</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="help.html">Help</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  </div>
+</nav>
+
+<div class="indexContainer">
+  <div class="panel panel-default" style="margin-bottom: 0px">
+    <div class="panel-heading">
+      <span style="font-size: 19px;font-weight: bolder">Formula Similarity Analysis</span>
+    </div>
+    <div class="panel-body">
+        <!--分页搜索框-->
+        <div>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="home">
+<!--              <form action="php_mysql/search.php" method="get" id="myform1">-->
+                <h4>Enter herb list of your formula, you could obtain the similar formulas from TCM2COVID database for your formula (see <a href="./help.html" target="_blank" style="cursor: pointer">help</a> for details).</h4>
+                  <h4>Your input:</h4>
+                  <input type="hidden" name="input_ID_type" value="pinyin">
+                  <div style="padding: 0px 20px 0px 20px">
+
+                      <div class="col-md-12 fangxiang" style="border:0px solid #ddd;border-radius: 0px;padding-top: 10px;padding-bottom: 20px;text-align:center;">
+                            <div class="col-md-7" style="border:1px solid #ddd;border-radius: 0px;padding-bottom: 28px;">
+                                <div class="box-title" style="width: 90%;max-width: 90%;margin: auto;margin-bottom: 20px">Start Similarity Analysis</div>
+                                <textarea cols="48" rows="12" id="input_list" name="myInput" style="background: white;border: 1px solid #dcdcdc;width: 80%;max-width: 80%;color: black;border: 1px solid #ccc;border-radius: 4px;padding: 10px;font-size: 16px"></textarea>
+<!--                                <h4 style="width: 80%;margin: auto;text-align: left">Example: ( <span onclick="document.getElementById('input_list').value='MA HUANG\r\n'+'KU XING REN\r\n'+'BAI ZHU\r\n'+'NIU HUANG\r\n'+'SHE DAN\r\n'+'SAN QI\r\n';return false;" style="cursor: pointer;color: #337ac7">#1</span>, <span onclick="document.getElementById('input_list').value='麻黄\r\n'+'苦杏仁\r\n'+'白术\r\n'+'牛黄\r\n'+'蛇胆\r\n'+'三七\r\n';return false;" style="cursor: pointer;color: #337ac7">#2</span>, <span onclick="document.getElementById('input_list').value='HERB003658\r\n'+'HERB003174\r\n'+'HERB000309\r\n'+'HERB004201\r\n'+'HERB004972\r\n'+'HERB004783\r\n';return false;" style="cursor: pointer;color: #337ac7">#3</span>, <span onclick="document.getElementById('input_list').value='Ephedra\r\n'+'bitter Apricot seed\r\n'+'rhizome of Largehead Atractylodes\r\n'+'Cow-bezoar\r\n'+'Snake bile\r\n'+'SAN QI\r\n';return false;" style="cursor: pointer;color: #337ac7">#4</span>)</h4>-->
+
+                                <div style="width: 80%;margin: auto;margin-bottom: 20px">
+                                    <div class="col-md-12" style="padding: 0px;margin-top: 20px">
+                                        <div class="col-md-3" style="text-align: left;padding-left: 0px">
+                                            <label class="selectpicker" style="line-height: 36px;font-size: 18px;font-weight: normal">P-Value:</label>
+                                        </div>
+                                        <div class="col-md-9" style="text-align: left">
+                                            <input id="pValue" name="pValue" type="number" class="form-control" max="1" min="0" step="0.01" value="0.05">
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="col-md-12" style="padding: 0px;margin-top: 15px">
+                                        <div class="col-md-3" style="text-align: left;padding-left: 0px;margin-bottom: 20px">
+                                            <label class="selectpicker" style="line-height: 36px;font-size: 18px;font-weight: normal">Herb Type:</label>
+                                        </div>
+                                        <div class="col-md-9" style="text-align: left">
+                                            <select id="inputtype" class="form-control">
+                                                <option value="pinyin" selected="">Herb Pinyin Name</option>
+                                                <option value="zhongwen">Herb Chinese Name</option>
+                                                <option value="english">Herb English Name</option>
+                                                <option value="herbid">Herb ID</option>
+                                            </select>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                                <div style="width: 200px; margin-left: auto; margin-right: auto;">
+                                    <input type="submit" class="btn btn-success search" value="Search" style="color: white;font-size: 16px;float: left" onclick="carryEnrich()">
+                                    <input type="reset" class="btn btn-md btn-primary reset" style="color: white;margin-left: 20px;font-size: 16px;float: right" value="Reset">
+                                    <div class="clearfix" style="height: 50px"></div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+
+                            <div class="col-md-5" style="padding-right: 0px">
+                                <div class="searchFrame" style="margin: 0px 5px 10px 15px;padding-bottom: 0px;">
+                                    <div class="searchTitle"><span style="color: white">Note</span></div>
+                                    <div style="margin: 24px 14px 24px 33px;">
+                                        <ul class="searchIntro" style="list-style: none;">
+                                            <li>
+                                                <span>Users can input or paste list of herbs to perform similarity analysis in TCM2COVID database.</span>
+                                            </li>
+                                            <li>
+                                                <span>For <b>'Herb Type'</b>, you can use <b>Herb Pinyin Name</b>, <b>Herb Chinese Name</b>, <b>Herb English Name</b> or <b>Herb ID</b>. (e.g. 'MA HUANG', '麻黄', 'Ephedra', 'HERB003658').</span>
+                                            </li>
+                                            <li>
+                                                <span>For <b>'P-Value'</b>, the threshold of the enrichment analysis, you can use specific threshold such as <b>'0.05'</b> or <b>'0.01'</b>.</span>
+                                            </li>
+                                            <li>
+                                                <p style="font-style: italic"><a href="help.html">For more note about search, click here to the Help websites</a></p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div style="margin: 10px 49px;margin-right: 0px">
+                                        <div id="moreInfo" style="margin-right: 20px; display: none;">
+                                            <p style="font-size:15px;line-height:25px;">
+                                                1. Check if you use the <b>official symbol or ID</b>. Alias are not supported in this pattern due to its inexplicit usage.<br><span style="margin-left: 20px">For convenience, you can switch to Fuzzy Search in this page.<br>
+                                                2. Carefully select a category before you enter a keyword.<br>
+                                                3. If you gained no result or too few results, you may use substring of the keyword.<br>
+                                                </span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                      </div>
+
+
+                  </div>
+
+<!--              </form>-->
+            </div>
+
+          </div>
+        </div>
+    </div>
+  </div>
+
+<div class="indexContainer">
+    <div class="panel panel-default" style="margin-top: 20px;display:none;" id="hidden_box">
+        <div class="panel-heading">
+            <div>
+                <span style="font-size: 19px;font-weight: bolder;float: left">Result of enrichment analysis</span>
+                <div style="float: right">
+                    <a id="img_download" href="" style="color: #333333;cursor: pointer;text-decoration: none" target="_blank">
+                        <span style="font-size: 19px;font-weight: bolder;"><i class="fa fa-window-maximize" style="margin-right: 2px"></i>Online reader&nbsp&nbsp&nbsp&nbsp</span>
+                    </a>
+                    <a id="res_download" href="" style="color: #333333;cursor: pointer;text-decoration: none" target="_blank">
+                        <span style="font-size: 19px;font-weight: bolder;"><i class="fa fa-download" style="margin-right: 2px"></i>Result download</span>
+                    </a>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="panel-body" style="">
+            <div class="col-md-12" style="text-align: center">
+                <div id="img_change" className="pdfobject-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+<div class="panel panel-default" style="margin-bottom: 0px">
+  <div class="panel-body" style="padding: 0px">
+    <div class="footer3" style="height: 75px;">
+      <p style="line-height: 25px">Contact<a href="Mailto:yangzhang@cdutcm.edu.cn" style="margin-left: 10px">yangzhang@cdutcm.edu.cn</a><br>
+        © Department of Bioinformatics </p>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
