@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="Shelly">
+  <meta name="keyword" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Result</title>
+
+  <link href="../css/general.css" rel="stylesheet" type="text/css">
+  <link href="../css/swiper-bundle.min.css" rel="stylesheet" >
+  <link href="../boostrap3/css/bootstrap.css" rel="stylesheet">
+  <link href="../datatable/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+  <link href="../datatable/buttons.dataTables.css" rel="stylesheet" type="text/css" />
+
+  <script src="../js/jquery-1.11.2.min.js"> </script>
+  <script src="../boostrap3/js/bootstrap.js" type="text/javascript"></script>
+  <script src="../js/swiper-bundle.min.js"> </script>
+
+  <script src="../datatable/dataTables.js" type="text/javascript"></script>
+  <script src="../datatable/dataTables.bootstrap.js" type="text/javascript"></script>
+
+  <script src="../datatable/dataTables.buttons.js" type="text/javascript"></script>
+  <script src="../datatable/" type="text/javascript"></script>
+  <script src="../datatable/buttons.html5.js" type="text/javascript"></script>
+  <script src="../datatable/jszip.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var keyword_input = $("#keyword_input").val();
+      console.log(keyword_input);
+      // getTable(keyword_input);
+
+      // 获取数据
+      var table = $('#example').DataTable({
+
+          "ajax": {
+            "url": "../php_mysql/ajax_getfilterData_batch.php",
+            "type": "GET",
+            "data": {
+              // 传参给 getTable.php, get方法后期可作为API
+              searchType: '<{$searchType}>',
+              "keyWord": keyword_input,
+              inputType: '<{$inputType}>',
+              species: '<{$species}>',
+              method: '<{$method}>'
+            },
+            // "dataType": "json",
+
+          },
+
+          // 此处已经获取到数据，开始定义 datatable 的呈现属性
+          "bServerSide": false,
+          "dom": '<"top"f>lrt<"toolbar"><"bottom"ip><"clear">',
+          // 加入下载按键
+          // "dom": '<"top"f>lrt<"btn"B><"toolbar"><"bottom"ip><"clear">',
+          // buttons: [
+          //   {
+          //     extend: 'copyHtml5',
+          //     text: 'Copy Current Data',
+          //     // className: 'btn btn-success btn-sm',
+          //   },
+          //   {
+          //     extend: 'excelHtml5',
+          //     title: 'Data export',
+          //     text: 'Save as Excel',
+          //   },
+          //   {
+          //     extend: 'csvHtml5',
+          //     title: 'Data export',
+          //     text: 'Save as CSV',
+          //   }
+          // ],
+          "deferRender": true,
+          "iDisplayLength" : 25, // 默认每一页显示多少条
+          "lengthChange": true,
+          "lengthMenu": [ 10, 25, 50 ],
+          "ordering": true,
+          "order": [[ 0, "asc" ]], //这里表格初始化时，第1列默认降序
+          "bAutoWidth" : false,
+          "columnDefs": [
+            {
+              "targets": 0,
+              "createdCell": function (td, cellData, rowData, row, col) {
+                // $(td).css('color', '#377eb8');
+              }
+            },
+            {
+              "targets": 1,
+              "createdCell": function (td, cellData, rowData, row, col) {
+                // $(td).css('color', '#b83778');
+              }
+            }
+          ],
+          "createdRow": function ( row, data, index ) {
+            // if ( index % 2 != 0 ) {
+            //   $('td', row).css('background',"#f2f2f2").css('font-weight',"normal");
+            // }
+            // if ( index % 2 == 0 ) {
+            //   $('td', row).css('font-weight',"normal");
+            // }
+
+            if(data['gene_ID']=="NA") {
+              $('td', row).eq(0).html('/');
+            }else {
+              $('td', row).eq(0).html('<a target="_blank" class="linkClass" style="color: #2440b3" href="https://www.ncbi.nlm.nih.gov/gene/?term='+data['gene_ID']+'">'+data['gene_ID']+'</a>');
+            }
+
+            if(data['uniprot']=="NA") {
+              $('td', row).eq(1).html('/');
+            }else {
+              $('td', row).eq(1).html('<a target="_blank" class="linkClass" style="color: #2440b3" href="https://www.uniprot.org/uniprot/'+data['uniprot']+'">'+data['uniprot']+'</a>');
+            }
+
+            if(data['gene_symbol']=="NA") {
+              $('td', row).eq(2).html('/');
+            }
+
+
+            $('td', row).eq(6).html('<a target="_blank" class="linkClass" style="color: #2440b3" href="../php_mysql/detail.php?id='+data['MCS_ID']+'">more</a>');
+
+          },
+          "sScrollX" : false,
+          // "scrollY": 550, // y轴是否需要滚动条
+          "scrollCollapse": false, // 滚动条是否在table
+
+          "language": {
+            "processing": "Searching, wait for a moment...",
+            "search":"Search:&nbsp;&nbsp;",
+            "loadingRecords": "Please wait - loading...",
+            "sLengthMenu": "show _MENU_ entries",
+            "emptyTable": "Sorry, no matched records were found! You can download all data in the download websites or give more loose restrictions.",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "infoEmpty": "No matched records were found!",
+            "paginate": {
+              "first": "First",
+              "previous": "Previous",
+              "next": "Next",
+              "last": "Last"
+            }
+          },
+          "paging": true, // 开启表格分页
+          pagingType: 'full_numbers',   // 分页器中的first 和 last都显示
+          "columns": [
+            {"data": "gene_ID", "width": "10%"},
+            {"data": "uniprot", "width": "10%"},
+            {"data": "gene_symbol", "width": "10%"},
+            {"data": "species", "width": "10%"},
+            {"data": "MCS", "width": "20"},
+            {"data": "Experimental_Method", "width": "30%"},
+            {"data": "MCS_ID", "width": "10%"}
+          ],
+          // "bSort": true,
+
+          // AJAX 请求结束以后的动作
+          initComplete: function (settings) {
+            // var json=jQuery.parseJSON(settings.jqXHR);
+            var response = settings.json;
+            // console.log(json);
+            // console.log(response);
+          },
+          "drawCallback": function (settings) {
+            // Here the response
+            // var json=jQuery.parseJSON(settings.jqXHR);
+            var response = settings.json;
+            // console.log(json);
+            // console.log(response);
+          },
+
+        });
+
+
+    });
+
+
+  </script>
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?50f0aa9070666122b13e0d8f58eefef0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+</head>
+<body>
+<nav class = "navbar navbar-custom" role = "navigation" style="border-radius: 0px">
+  <div class="container lty" style="min-height: 80px;">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle = "collapse"  data-target = "#target-menu">
+        <span class="sr-only"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <a href="../index.html" class="navbar-brand">
+        <p class="log">MCSdb</p>
+        <!--                    <img src="image/logo1.png">-->
+      </a>
+
+    </div>
+    <div class="collapse navbar-collapse" id="target-menu" style="vertical-align: middle;">
+      <ul class="nav navbar-nav navbar-right">
+        <li class="nav-item">
+          <a class="navgation" href="../index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="../search.html">Search</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="../browse.html">Browse</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="../complex.html">Complex</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="../submit.html">Submit</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="../download.html">Download</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="../statistics.html">Statistics</a>
+        </li>
+        <li class="nav-item">
+          <a class="navgation" href="../help.html">Help</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="indexContainer">
+  <div class="panel panel-default" style="margin-bottom: 0px">
+    <div class="panel-heading">
+      <span style="font-size: 19px;font-weight: bolder">Result in MCSdb</span>
+    </div>
+    <div class="panel-body">
+      <!--结果展示-->
+      <input value="<{$keyWord}>" id="keyword_input" hidden>
+      <table id="example" class="table table-sm table-bordered dataTable table-hover"  width="100%">
+        <thead>
+        <tr>
+          <th style="padding-left: 8px;font-weight: bolder;">Gene ID</th>
+          <th style="padding-left: 8px;font-weight: bolder;">Uniprot ID</th>
+          <th style="padding-left: 8px;font-weight: bolder;">Symbol</th>
+          <th style="padding-left: 8px;font-weight: bolder;">Species</th>
+          <th style="padding-left: 8px;font-weight: bolder;">MCS</th>
+          <th style="padding-left: 8px;font-weight: bolder;">Experimental Method</th>
+          <th style="padding-left: 8px;font-weight: bolder;">More</th>
+        </tr>
+        </thead>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<div class="panel panel-default" style="margin-bottom: 0px">
+  <div class="panel-body" style="padding: 0px">
+    <div class="footer3" style="height: 75px;">
+      <p style="line-height: 25px;margin-left: 0px;color: black;font-size: 16px">Contact  <a href="Mailto:zhy1001@alu.uestc.edu.cn" style="margin-left: 0px;color: black;" class="myEmail">zhy1001@alu.uestc.edu.cn</a> or <a href="Mailto:yangzhang@cdutcm.edu.cn" style="margin-left: 0px;color: black;" class="myEmail">yangzhang@cdutcm.edu.cn</a><br>
+        © Department of Bioinformatics </p>
+
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

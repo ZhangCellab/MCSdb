@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Shelly">
+    <meta name="keyword" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Result</title>
+
+    <link href="../css/general.css" rel="stylesheet" type="text/css">
+    <link href="../css/swiper-bundle.min.css" rel="stylesheet" >
+    <link href="../boostrap3/css/bootstrap.css" rel="stylesheet">
+    <link href="../datatable/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+    <link href="../datatable/buttons.dataTables.css" rel="stylesheet" type="text/css" />
+    <link href="../css/font-awesome.css" rel="stylesheet" type="text/css" />
+
+    <script src="../js/jquery-1.11.2.min.js"> </script>
+    <script src="../boostrap3/js/bootstrap.js" type="text/javascript"></script>
+    <script src="../js/swiper-bundle.min.js"> </script>
+
+    <script src="../js/echart/echarts.js" type="text/javascript"></script>
+    <script src="../js/echart/dataTool.min.js" type="text/javascript"></script>
+    <script src="../js/myJS.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            window.onresize=function(){
+                myChart.resize();
+            }
+
+        });
+
+    </script>
+
+    <style>
+        .table {
+            margin-bottom: 0 !important;
+            border: 1px solid #dddddd;
+            border-collapse: collapse !important;
+            border-radius: 1px;
+        }
+        table {
+            margin-bottom: 0 !important;
+            border-bottom: 1px solid #dddddd;
+            border-collapse: collapse !important;
+            border-radius: 1px !important;
+        }
+        #res_table tr td:first-child {
+            text-align: right;
+            /*background: #8fbbf0;*/
+            padding-right: 20px;
+            font-size: 16px;
+            border-right: 1px solid #d4cfcf;
+            font-weight: bold;
+        }
+        #res_table tr td:last-child {
+            text-align: left;
+            padding-left: 20px;
+            font-size: 16px;
+        }
+        .table>tbody>tr>td,
+        .table>tbody>tr>th,
+        .table>tfoot>tr>td,
+        .table>tfoot>tr>th,
+        .table>thead>tr>td,
+        .table>thead>tr>th {
+            padding: 8px;
+            vertical-align: top;
+            border-top: 1.2px solid #f4f3f3; /*边框颜色*/
+        }
+        p.title-lty{
+            font-size: 20px;
+            font-style: italic;
+            margin: 20px 0 10px 0px;
+            font-weight: bold;
+        }
+        #res_table td span,a{
+            color: black;
+            font-size: 16px;
+        }
+
+        a{
+            color: #337ab7;
+        }
+        .titleTd {
+            width: 30%;
+            font-weight: bold;
+            padding: 8px 15px;
+            padding-right: 16px;
+            text-align: right;
+        }
+        table.pmid > tbody > tr > td {
+            font-size: 16px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+        }
+        table.pmid{
+
+        }
+        #clinical_table td{
+            padding: 2px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        #covid_table tr td:first-child {
+            text-align: right;
+            /*background: #8fbbf0;*/
+            padding-right: 20px;
+            font-size: 16px;
+            border-right: 1px solid #d4cfcf;
+            font-weight: bold;
+        }
+        #covid_table tr td:last-child {
+            text-align: left;
+            padding-left: 20px;
+            font-size: 16px;
+        }
+        #res_table a{
+            text-decoration: underline;
+        }
+        #text-source a{
+            text-decoration: underline;
+        }
+        .tdDetailType{
+            padding: 1px 7px;
+            color: #ffffff;
+            background-color: #144875;
+            border-radius: 15px;
+        }
+        i.fa{
+            margin-right: 10px;
+        }
+    </style>
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?50f0aa9070666122b13e0d8f58eefef0";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+</head>
+<body>
+<nav class = "navbar navbar-custom" role = "navigation" style="border-radius: 0px">
+    <div class="container lty" style="min-height: 80px;">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle = "collapse"  data-target = "#target-menu">
+                <span class="sr-only"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a href="../index.html" class="navbar-brand">
+                <p class="log">MCSdb</p>
+                <!--                    <img src="image/logo1.png">-->
+            </a>
+
+        </div>
+        <div class="collapse navbar-collapse" id="target-menu" style="vertical-align: middle;">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="nav-item">
+                    <a class="navgation" href="../index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="navgation" href="../search.html">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="navgation" href="../browse.html">Browse</a>
+                </li>
+                <li class="nav-item">
+                    <a class="navgation" href="../complex.html">Complex</a>
+                </li>
+                <li class="nav-item">
+                    <a class="navgation" href="../submit.html">Submit</a>
+                </li>
+                <li class="nav-item">
+                    <a class="navgation" href="../download.html">Download</a>
+                </li>
+                <li class="nav-item">
+                    <a class="navgation" href="../statistics.html">Statistics</a>
+                </li>
+                <li class="nav-item">
+                    <a class="navgation" href="../help.html">Help</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="indexContainer">
+    <div class="panel panel-default" style="margin-bottom: 0px">
+        <div class="panel-heading">
+            <span style="font-size: 22px;font-weight: bolder">Detail information of Complex</span>
+        </div>
+        <div class="panel-body" style="text-align: center">
+
+            <!--复合物信息-->
+            <p class="title-lty" align="left" style="margin-top: 2px"><i class="fa fa-puzzle-piece fa-lg" aria-hidden="true"></i>Basic Information:</p>
+            <table id="res_table" class="table table-hover table-striped" style="">
+                <tbody>
+                <{if trim($ID)!='' & trim($ID)!='NA'}>
+                <tr>
+                    <td style="width: 30%">
+                        <span>Complex ID</span>
+                    </td>
+                    <td style="width: 70%">
+                        <span><{trim($ID)}></span>
+                    </td>
+                </tr>
+                <{/if}>
+
+                <{if trim($complex)!='' & trim($complex)!='NA'}>
+                <tr>
+                    <td style="width: 30%">
+                        <span>Complex</span>
+                    </td>
+                    <td style="width: 70%">
+                        <{$num=0}>
+                        <{$herb_info_arr=explode("_", $complex)}>
+                        <{$o_length=count($herb_info_arr)}>
+                        <{foreach $herb_info_arr as $key => $value}>
+                            <{if trim($value) != ''}>
+                                <{$num=$num+1}>
+                                <{if $num==$o_length}>
+                                <{trim($value)}>
+                                <{else}>
+                                <{trim($value)}>;
+                                <{/if}>
+                            <{/if}>
+                        <{/foreach}>
+                    </td>
+                </tr>
+                <{/if}>
+
+                <{if trim($subunitNumber)!='' & trim($subunitNumber)!='NA'}>
+                <tr>
+                    <td style="width: 30%">
+                        <span>Subunit Number</span>
+                    </td>
+                    <td style="width: 70%">
+                        <span><{trim($subunitNumber)}></span>
+                    </td>
+                </tr>
+                <{/if}>
+
+                <{if trim($MCS)!='' & trim($MCS)!='NA'}>
+                <tr>
+                    <td style="width: 30%">
+                        <span>Membrane Contact Site</span>
+                    </td>
+                    <td>
+                        <span><{$MCS}></span>
+                        <div class="col-md-12" style="padding-left: 0px;">
+                            <div class="col-md-5" style="padding-left: 0px;margin-top: 6px">
+                                <img src='../images/o2o/<{$MCS}>.jpg' style="width: 100%">
+                            </div>
+                            <div class="col-md-5">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <{/if}>
+
+                <{if trim($species)!='' & trim($species)!='NA'}>
+                <tr>
+                    <td style="width: 30%">
+                        <span>Species</span>
+                    </td>
+                    <td style="width: 70%">
+                        <span><{trim($species)}></span>
+                    </td>
+                </tr>
+                <{/if}>
+
+                </tbody>
+            </table>
+
+            <p class="title-lty" align="left" style="margin-top: 15px"><i class="fa fa-puzzle-piece fa-lg" aria-hidden="true"></i>Subunit Information:</p>
+            <!--结果展示-->
+            <{$c_num=0}>
+                <{foreach $complex_info as $complexItem}>
+                    <{$tmp_p_arr=explode('|', trim($complexItem["p_subunites"]))}>
+                    <{$tmp_c_arr=explode('|', trim($complexItem["c_subunites"]))}>
+                    <{if trim($complexItem["p_subunites"])!="" || trim($complexItem["c_subunites"])!=""}>
+                        <{$c_num=$c_num+1}>
+                            <{if trim($complexItem["p_subunites"])!=""}>
+                            <table id="res_complex" class="table table-hover table-striped" style="">
+                                <thead>
+                                    <tr class="tablehead">
+                                        <td style="font-size: 16px;font-weight: bolder;line-height: 20px;width: 18%;padding-left: 20px">Subunit</td>
+                                        <td style="font-size: 16px;font-weight: bolder;line-height: 20px;width: 18%;padding-left: 20px">Symbol</td>
+                                        <td style="font-size: 16px;font-weight: bolder;line-height: 20px;width: 18%;padding-left: 20px">Uniprot ID</td>
+                                        <td style="font-size: 16px;font-weight: bolder;line-height: 20px;width: 18%;padding-left: 20px">Subcellular location</td>
+                                        <td style="font-size: 16px;font-weight: bolder;line-height: 20px;width: 28%;padding-left: 20px">More</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <{$s_num=0}>
+                                    <{foreach $tmp_p_arr as $key => $item}>
+                                    <{$s_num=$s_num+1}>
+                                    <tr>
+                                        <{$tmp_td_arr=explode('_', $item)}>
+                                        <td style="font-size: 16px;padding-left: 20px">subunit:<{$s_num}></td>
+                                        <td style="font-size: 16px;padding-left: 20px"><{trim($tmp_td_arr[1])}></td>
+                                        <td style="font-size: 16px;padding-left: 20px"><a href="https://www.uniprot.org/uniprot/<{trim($tmp_td_arr[2])}>" target="_blank"><{trim($tmp_td_arr[2])}></a></td>
+                                        <{if trim($tmp_td_arr[3])==""}>
+                                            <td style="font-size: 16px;padding-left: 20px">-</td>
+                                        <{else}>
+                                            <td style="font-size: 16px;padding-left: 20px"><{trim($tmp_td_arr[3])}></td>
+                                        <{/if}>
+                                        <td style="font-size: 16px;padding-left: 20px"><a href="../php_mysql/detail.php?id=<{trim($tmp_td_arr[0])}>">more</a></td>
+                                    </tr>
+                                    <{/foreach}>
+                                </tbody>
+                            </table>
+                            <{/if}>
+                            <{if trim($complexItem["c_subunites"])!=""}>
+                            <table id="res_compond" class="table table-hover table-striped" style="margin-top: 10px">
+                                <thead>
+                                <tr class="tablehead">
+                                    <td style="font-size: 16px!important;font-weight: bolder;line-height: 20px;width: 18%;padding-left: 20px">Subunit</td>
+                                    <td style="font-size: 16px!important;font-weight: bolder;line-height: 20px;width: 18%;padding-left: 20px">Symbol</td>
+                                    <td style="font-size: 16px!important;font-weight: bolder;line-height: 20px;width: 18%;padding-left: 20px">PubChem ID</td>
+                                    <td style="font-size: 16px!important;font-weight: bolder;line-height: 20px;width: 18%;padding-left: 20px">Molecular Formula</td>
+                                    <td style="font-size: 16px!important;font-weight: bolder;line-height: 20px;width: 28%;padding-left: 20px">SMILES</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <{foreach $tmp_c_arr as $key => $item}>
+                                    <{$s_num=$s_num+1}>
+                                    <{$tmp_td_arr=explode('_', $item)}>
+                                        <tr>
+                                            <td style="font-size: 16px!important;font-weight: normal;padding-left: 20px" >subunit:<{$s_num}></td>
+                                            <td style="font-size: 16px!important;font-weight: normal;padding-left: 20px"><{$tmp_td_arr[0]}></td>
+                                            <td style="font-size: 16px!important;font-weight: normal;padding-left: 20px"><a href="https://pubchem.ncbi.nlm.nih.gov/compound/<{$tmp_td_arr[1]}>" target="_blank"><{$tmp_td_arr[1]}></a></td>
+                                            <td style="font-size: 16px!important;font-weight: normal;padding-left: 20px"><{$tmp_td_arr[2]}></td>
+                                            <td style="font-size: 16px!important;font-weight: normal;padding-left: 20px"><{$tmp_td_arr[3]}></td>
+                                        </tr>
+                                    <{/foreach}>
+                                </tbody>
+                            </table>
+                            <{/if}>
+
+                            <!--  复合物的文献信息-->
+                            <{if trim($complexItem["PMID"])!=""}>
+                                <p class="title-lty" align="left" style="margin-top: 15px"><i class="fa fa-puzzle-piece fa-lg" aria-hidden="true"></i>References:</p>
+                                <{$pmid_arr_tmp = explode("__", trim($complexItem["PMID"]))}>
+                                <{$description_arr_tmp = explode("__", trim($complexItem['description']))}>
+                                <{$all_pmid_arr_tmp = array_combine($pmid_arr_tmp, $description_arr_tmp)}>
+                                <{foreach $all_pmid_arr_tmp as $key_pmid => $item_pmid}>
+                                    <table id="res_pmid_comlex" class="table table-hover table-striped" style="margin-top: 10px">
+                                        <thead>
+                                        <tr>
+                                            <td style="width: 20%;font-size: 16px;padding-left: 20px;background-color: #f1f1f1">Pubmed ID</td>
+                                            <td style="width: 80%;font-size: 16px;padding-left: 20px;text-align: left"><a href="https://pubmed.ncbi.nlm.nih.gov/<{$key_pmid}>" target="_blank"><{$key_pmid}></a></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%;font-size: 16px;padding-left: 20px;background-color: #f1f1f1">Description</td>
+                                            <td style="width: 80%;font-size: 16px;padding-left: 20px;text-align: left"><{$item_pmid}></td>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                <{/foreach}>
+                            <{/if}>
+
+                    <{/if}>
+                <{/foreach}>
+
+                <!--  网络图-->
+<!--                <div class="col-md-12" style="border: 5px solid #dddddd;border-radius: 10px;margin-bottom: 20px">-->
+<!--                    <div id="main_relation" style="width: 80%;height:600px;margin: auto;"></div>-->
+<!--                </div>-->
+<!--                <script>-->
+<!--                var myChart = echarts.init(document.getElementById("main_relation"));-->
+
+<!--                var option = null;-->
+
+<!--                myChart.showLoading();-->
+
+<!--                var protein_arr_js = '<{$echart_node_p}>';-->
+<!--                var compond_arr_js = '<{$echart_node_c}>';-->
+
+<!--                protein_arr_js = protein_arr_js.split("|");-->
+<!--                // console.log(protein_arr_js);-->
+
+<!--                //定义一个数组 这里我们吧new Array()换成{}的形式-->
+<!--                var data = [];-->
+<!--                for (var i = 0; i < protein_arr_js.length; i++) {-->
+
+<!--                    data[i] = {};-->
+
+<!--                    data[i]['id'] = protein_arr_js[i].split("_")[0].trim();-->
+<!--                    data[i]['name'] = protein_arr_js[i].split("_")[1].trim();-->
+<!--                    data[i]['category'] = 0;-->
+<!--                }-->
+
+<!--                compond_arr_js = compond_arr_js.split("|");-->
+<!--                // console.log(compond_arr_js);-->
+<!--                var tmp_i = 0;-->
+
+<!--                for (var i = protein_arr_js.length; i < (protein_arr_js.length+compond_arr_js.length); i++) {-->
+
+<!--                    data[i] = {};-->
+
+<!--                    data[i]['id'] = compond_arr_js[tmp_i].split("_")[1].trim();-->
+<!--                    data[i]['name'] = compond_arr_js[tmp_i].split("_")[0].trim();-->
+<!--                    data[i]['category'] = 1;-->
+
+<!--                    tmp_i = tmp_i + 1;-->
+<!--                }-->
+
+
+<!--                //打印数组-->
+<!--                console.log(data);-->
+
+<!--                var data_link = [];-->
+<!--                for (var i = 0; i < herb_arr.length; i++) {-->
+<!--                    data_link[i] = {};-->
+
+<!--                    data_link[i]['source'] = formula_id.trim();-->
+<!--                    data_link[i]['target'] = herb_arr[i].split("|")[0].trim();-->
+<!--                }-->
+<!--                // console.log(data_link);-->
+
+<!--                var final_arr = {};-->
+<!--                final_arr['categories'] = [-->
+<!--                    {"name": "Herb"},-->
+<!--                    {"name": "Formula"}]-->
+<!--                final_arr['nodes'] = data-->
+<!--                final_arr['links'] = data_link-->
+<!--                // console.log(final_arr);-->
+<!--                //转换json打印-->
+<!--                var res = JSON.stringify(final_arr);-->
+<!--                // console.log(res);-->
+
+<!--                graph = final_arr;-->
+<!--                console.log(graph.nodes);-->
+<!--                console.log(typeof(graph.nodes));-->
+
+<!--                myChart.hideLoading();-->
+<!--                graph.nodes.forEach(function (node) {-->
+<!--                    node.symbolSize = 20;-->
+<!--                    node.label = {-->
+<!--                        show: node.symbolSize > 0-->
+<!--                    };-->
+<!--                });-->
+<!--                option = {-->
+<!--                    title: {-->
+<!--                    },-->
+<!--                    toolbox: {-->
+<!--                        top: 75,-->
+<!--                        right: 26,-->
+<!--                        show : true,-->
+<!--                        feature : {-->
+<!--                            mark : {show: true},-->
+<!--                            //  dataView : {show: true, readOnly: false},-->
+<!--                            magicType : {-->
+<!--                                show: true,-->
+<!--                                type: ['pie', 'funnel']-->
+<!--                            },-->
+<!--                            restore : {-->
+<!--                                show: true,-->
+<!--                                title: 'restore',-->
+<!--                            },-->
+<!--                            saveAsImage : {-->
+<!--                                show: true,-->
+<!--                                title: 'save',-->
+<!--                            }-->
+<!--                        }-->
+<!--                    },-->
+<!--                    tooltip: {},-->
+<!--                    animationDurationUpdate: 1500,-->
+<!--                    animationEasingUpdate: 'quinticInOut',-->
+<!--                    // color: ['#2db7f5','#ff6600'],-->
+<!--                    legend: [{-->
+<!--                        data: graph.categories.map(function (a) {-->
+<!--                            return a.name;-->
+<!--                        }),-->
+<!--                        itemHeight: 25,-->
+<!--                        itemWidth: 60,-->
+<!--                        textStyle: {-->
+<!--                            fontSize: 16,-->
+<!--                            color: '#000'-->
+<!--                        },-->
+<!--                        show:true,-->
+<!--                        type: 'scroll',-->
+<!--                        orient: 'vertical',-->
+<!--                        top: "20",-->
+<!--                        left: "0",-->
+<!--                        itemGap: 13,-->
+<!--                        // icon: 'rectangle',-->
+<!--                    }],-->
+<!--                    series: [-->
+<!--                        {-->
+<!--                            name: '',-->
+<!--                            type: 'graph',-->
+<!--                            layout: 'circular', // force-->
+<!--                            circular: {-->
+<!--                                rotateLabel: true-->
+<!--                            },-->
+<!--                            data: graph.nodes,-->
+<!--                            links: graph.links,-->
+<!--                            categories: graph.categories,-->
+<!--                            top: "25%",-->
+<!--                            bottom: "25%",-->
+<!--                            avoidLabelOverlap: true,-->
+<!--                            roam: true,-->
+<!--                            draggable: true,-->
+<!--                            itemStyle: {-->
+<!--                                normal: {-->
+<!--                                    borderColor: '#fff',-->
+<!--                                    borderWidth: 1,-->
+<!--                                    shadowBlur: 15,-->
+<!--                                    shadowColor: 'rgba(0, 0, 0, 0.3)',-->
+<!--                                    label: {-->
+<!--                                        show: true-->
+<!--                                    },-->
+
+<!--                                }-->
+<!--                            },-->
+<!--                            label: {-->
+<!--                                normal: {-->
+<!--                                    show: true,-->
+<!--                                    fontSize: 12,-->
+<!--                                    position: 'top',-->
+<!--                                    // formatter: '{b}',-->
+<!--                                    formatter: function (params, index) {-->
+<!--                                        // 超出省略-->
+<!--                                        // console.log(params.data.name);-->
+<!--                                        // console.log(index);-->
+<!--                                        params = params.data.name.toString();-->
+<!--                                        var maxlength= 20;-->
+<!--                                        if (params.length>maxlength) {-->
+<!--                                            return params.substring(0, maxlength-1)+'...';-->
+<!--                                        }else{-->
+<!--                                            return params;-->
+<!--                                        }},-->
+<!--                                    fontFamily: 'arial',-->
+<!--                                },-->
+
+<!--                            },-->
+<!--                            lineStyle: {-->
+<!--                                color: 'source',-->
+<!--                                curveness: 0.3,-->
+<!--                                width: 4-->
+<!--                            }-->
+<!--                        }-->
+<!--                    ]-->
+<!--                };-->
+
+<!--                myChart.setOption(option);-->
+
+<!--                //点击事件-->
+<!--                myChart.on('click', function (param) {-->
+<!--                    console.log(param.data.id);-->
+<!--                    // console.log(param);-->
+<!--                    if (param.data.id != "") {-->
+<!--                        setTimeout(function(){-->
+<!--                                // 跳转的等待页面-->
+<!--                                // document.getElementById("over").style.display="none";-->
+<!--                                // document.getElementById("layout").style.display="none";-->
+<!--                                //goto a new search by "name"-->
+<!--                                window.open("../php_mysql/detail.php?id=" + param.data.id); }-->
+<!--                            , 100);-->
+<!--                    }-->
+
+<!--                });-->
+
+<!--            </script>-->
+
+
+
+
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default" style="margin-bottom: 0px">
+    <div class="panel-body" style="padding: 0px">
+        <div class="footer3" style="height: 75px;">
+            <p style="line-height: 25px;margin-left: 0px;color: black;font-size: 16px">Contact  <a href="Mailto:zhy1001@alu.uestc.edu.cn" style="margin-left: 0px;color: black;" class="myEmail">zhy1001@alu.uestc.edu.cn</a> or <a href="Mailto:yangzhang@cdutcm.edu.cn" style="margin-left: 0px;color: black;" class="myEmail">yangzhang@cdutcm.edu.cn</a><br>
+                © Department of Bioinformatics </p>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+</script>
+</body>
+</html>
